@@ -2,6 +2,24 @@
 from flask import request
 from flask_restplus import Namespace, Resource, fields
 from http import HTTPStatus
+from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "<ostgresql://postgres:5718614@localhost/aplicaciones"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+
+class Prediccion(db.Model):
+	__table_args__= {'schema' : 'aplicaciones'}
+	__tablename__ = 'pred'
+	id = db.Column(db.Integer, primary_key=True)
+	score_from = db.Column(db.Text)
+	score = db.Column(db.Text)
+	fecha = db.DateTime
+	def __repr__(self):
+		return (u'<{self.__class__.__name__}: {self.id}>'.format(self=self))
 
 namespace = Namespace('predicciones', 'Proyecto 4')
 
@@ -9,6 +27,10 @@ entity_model = namespace.model('Entity', {
     'id': fields.Integer(
         readonly=True,
         description='Identificador indexado'
+    ),
+    'score_from': fields.String(
+	required=True,
+	description='score_from'
     ),
     'score': fields.String(
         required=True,
@@ -34,16 +56,15 @@ entity_list_model = namespace.model('EntityList', {
 entity_example = {'id': 1, 'name': 'Entity name'}
 
 
-@namespace.route('/prediction_id/<int:prediccion_id>')
+@namespace.route('/prediction_id/<int:id>')
 class entity(Resource):
     '''Obtener predicción por id'''
-
     @namespace.response(404, 'Entity not found')
     @namespace.response(500, 'Internal Server error')
     @namespace.marshal_with(entity_model)
-    def get(self, entity_id):
+    def get(self, id):
         '''Obetner predicción a través de su id'''
-
+        match = Prediccion.query.filter_by(id=id)
         return entity_example
 
 @namespace.route('/predictions_date/<string:prediccion_date>')
