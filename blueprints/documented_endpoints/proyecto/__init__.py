@@ -1,13 +1,13 @@
 # blueprints/documented_endpoints/entities/__init__.py
 from flask import request
-from flask_restplus import Namespace, Resource, fields
+from flask_restplus import Namespace, Resource, fields, Api
 from http import HTTPStatus
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "<ostgresql://postgres:5718614@localhost/aplicaciones"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:5718614@127.0.0.1:54638/aplicaciones"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+namespace = Api(app)
 db = SQLAlchemy(app)
 
 
