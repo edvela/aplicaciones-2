@@ -1,15 +1,24 @@
 # blueprints/documented_endpoints/entities/__init__.py
+
 from flask import request
 from flask_restplus import Namespace, Resource, fields, Api
 from http import HTTPStatus
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:5718614@127.0.0.1:54638/aplicaciones"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-namespace = Api(app)
-db = SQLAlchemy(app)
+from flask_marshmallow import Marshmallow
 
+
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://eder_pg:aplicaciones@localhost/aplicaciones"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['SECRET_KEY']=True
+#namespace = Api(app)
+#namespace.init_app(app)
+db = SQLAlchemy(app)
+ma=Marshmallow(app)
+api = Api()
+api.init_app(app)
 
 class Prediccion(db.Model):
 	__table_args__= {'schema' : 'aplicaciones'}
@@ -53,7 +62,7 @@ entity_list_model = namespace.model('EntityList', {
     ),
 })
 
-entity_example = {'id': 1, 'name': 'Entity name'}
+prediccion_ejemplo = {'id': 1, 'name': 'predicción de ejemplo...'}
 
 
 @namespace.route('/prediction_id/<int:id>')
@@ -65,7 +74,7 @@ class entity(Resource):
     def get(self, id):
         '''Obetner predicción a través de su id'''
         match = Prediccion.query.filter_by(id=id)
-        return entity_example
+        return prediccion_ejemplo
 
 @namespace.route('/predictions_date/<string:prediccion_date>')
 class entity(Resource):
